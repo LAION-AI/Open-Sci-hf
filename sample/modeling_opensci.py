@@ -258,10 +258,10 @@ class OpensciAttention(nn.Module):
         self.qk_layernorm = config.qk_layernorm
         if self.qk_layernorm:
             self.q_layernorm = nn.LayerNorm(
-                config.hidden_size // config.num_attention_heads, eps=config.layer_norm_eps, elementwise_affine=False
+                config.hidden_size // config.num_attention_heads, eps=config.layer_norm_eps, elementwise_affine=True, bias=False
             )
             self.k_layernorm = nn.LayerNorm(
-                config.hidden_size // config.num_attention_heads, eps=config.layer_norm_eps, elementwise_affine=False
+                config.hidden_size // config.num_attention_heads, eps=config.layer_norm_eps, elementwise_affine=True, bias=False
             )
 
     def forward(
