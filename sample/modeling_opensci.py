@@ -253,16 +253,10 @@ class OpensciAttention(nn.Module):
         self.o_proj = nn.Linear(
             config.num_attention_heads * self.head_dim, config.hidden_size, bias=config.attention_bias
         )
-        # https://github.com/huggingface/transformers/blob/1feebb5b4150882deabddd190a541f336f3be817/src/transformers/models/phi/modular_phi.py#L42-L49
-        # It is necessary to verify whether the Megatron LM code actually corresponds to the implementation.
         self.qk_layernorm = config.qk_layernorm
         if self.qk_layernorm:
-            self.q_layernorm = nn.LayerNorm(
-                config.hidden_size // config.num_attention_heads, eps=config.layer_norm_eps, elementwise_affine=True, bias=False
-            )
-            self.k_layernorm = nn.LayerNorm(
-                config.hidden_size // config.num_attention_heads, eps=config.layer_norm_eps, elementwise_affine=True, bias=False
-            )
+            self.q_norm = OpensciRMSNorm(config.head_dim, eps=config.rms_norm_eps)
+            self.k_norm = OpensciRMSNorm(config.head_dim, eps=config.rms_norm_eps)
 
     def forward(
         self,
@@ -280,11 +274,9 @@ class OpensciAttention(nn.Module):
         key_states = self.k_proj(hidden_states).view(hidden_shape).transpose(1, 2)
         value_states = self.v_proj(hidden_states).view(hidden_shape).transpose(1, 2)
 
-        # https://github.com/huggingface/transformers/blob/1feebb5b4150882deabddd190a541f336f3be817/src/transformers/models/phi/modular_phi.py#L67-L69
-        # It is necessary to verify whether the Megatron LM code actually corresponds to the implementation.
         if self.qk_layernorm:
-            query_states = self.q_layernorm(query_states)
-            key_states = self.k_layernorm(key_states)
+            query_states = self.q_norm(query_states)
+            key_states = self.k_norm(key_states)
         cos, sin = position_embeddings
         query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin)
 

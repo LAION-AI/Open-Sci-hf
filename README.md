@@ -19,8 +19,8 @@ OpensciForCausalLM(
           (k_proj): Linear(in_features=2048, out_features=2048, bias=True)
           (v_proj): Linear(in_features=2048, out_features=2048, bias=True)
           (o_proj): Linear(in_features=2048, out_features=2048, bias=True)
-          (q_layernorm): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
-          (k_layernorm): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+          (q_norm): OpensciRMSNorm((64,), eps=1e-05)
+          (k_norm): OpensciRMSNorm((64,), eps=1e-05)
         )
         (mlp): OpensciMLP(
           (gate_proj): Linear(in_features=2048, out_features=5440, bias=True)
